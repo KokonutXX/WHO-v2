@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UniVerse – Québec & Ontario</title>
+<link rel="icon" href="img/logo-icon.png" type="image/png">
+<link rel="apple-touch-icon" href="img/logo-icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/search.css">
+<link rel="stylesheet" href="css/results.css">
+<link rel="stylesheet" href="css/university.css">
+</head>
+<body>
+
+<!-- ================= PAGE 1: SEARCH ================= -->
+<section class="page active" id="p0">
+  <div class="bar top">
+    <div class="brand"><img src="img/logo-icon.png" alt=""><span>UniVerse</span></div>
+    <div class="lang" role="group" data-i18n-aria="language"><button type="button" data-lang="en">EN</button><button type="button" data-lang="fr">FR</button></div>
+  </div>
+  <div class="hero"><div class="hero-in">
+    <h1><span data-i18n="tagline">Less searching, more discovering.</span> <span class="tag2" data-i18n="tagline2">Find your UniVerse-ty</span></h1>
+    <p data-i18n="sub">Quebec and Ontario, compared side by side.</p>
+    <form class="search" id="form" autocomplete="off">
+      <div class="field">
+        <label for="prog" data-i18n="program">Program</label>
+        <input id="prog" data-i18n-ph="progPh" role="combobox" aria-controls="opts" aria-autocomplete="list">
+        <ul class="opts" id="opts" role="listbox"></ul>
+      </div>
+      <div class="two">
+        <div class="field"><label for="rs" data-i18n="rscoreOpt">R-score (optional)</label><input id="rs" type="number" step="0.1" min="0" max="50" data-i18n-ph="eg" data-v="31"></div>
+        <div class="field"><label for="gr" data-i18n="gradeOpt">Grade % (optional)</label><input id="gr" type="number" step="0.1" min="0" max="100" data-i18n-ph="eg" data-v="88"></div>
+      </div>
+      <div class="two">
+        <div class="field"><label for="loc" data-i18n="location">Location</label><input id="loc" list="cities" data-i18n-ph="cityOpt"><datalist id="cities"></datalist></div>
+        <div class="field"><label for="rad" data-i18n="within">Within</label>
+          <select id="rad"><option value="0" data-i18n="anywhere">Anywhere</option><option value="50">50 km</option><option value="100">100 km</option><option value="250">250 km</option><option value="500">500 km</option></select></div>
+      </div>
+      <p class="hint" id="err" role="alert"></p>
+      <button class="btn" type="submit" data-i18n="search">Search</button>
+    </form>
+  </div></div>
+</section>
+
+<!-- ================= PAGE 2: RESULTS ================= -->
+<section class="page" id="p1">
+  <div class="bar">
+    <div class="brand"><img src="img/logo-icon.png" alt=""><span>UniVerse</span></div>
+    <div class="bar-r"><button class="btn ghost" data-go="0" data-i18n="newSearch">New search</button>
+      <div class="lang" role="group" data-i18n-aria="language"><button type="button" data-lang="en">EN</button><button type="button" data-lang="fr">FR</button></div></div>
+  </div>
+  <div class="layout">
+    <aside class="side">
+      <div class="box">
+        <h3 data-i18n="yourSearch">Your search</h3>
+        <div class="sum" id="sum"></div>
+      </div>
+      <div class="box">
+        <h3><label for="sort" data-i18n="sortBy">Sort by</label></h3>
+        <div class="field">
+          <select id="sort">
+            <option value="fit" data-i18n="s_fit">Best chance of admission</option>
+            <option value="rscore" data-i18n="s_rscore">R-score (0–40)</option>
+            <option value="grade" data-i18n="s_grade">Grade (0–100%)</option>
+            <option value="distance" data-i18n="s_distance">Distance (km)</option>
+            <option value="deadline" data-i18n="s_deadline">Admission deadline (DD/MM/YY)</option>
+            <option value="docs" data-i18n="s_docs">Admission documents (Y/N + type)</option>
+            <option value="interview" data-i18n="s_interview">Interview (Y/N)</option>
+            <option value="tuition" data-i18n="s_tuition">Tuition cost ($ CAD)</option>
+            <option value="clubs" data-i18n="s_clubs">Student clubs (number)</option>
+            <option value="schol" data-i18n="s_schol">Scholarships ($ CAD)</option>
+            <option value="living" data-i18n="s_living">Living cost (rent + groceries)</option>
+            <option value="success" data-i18n="s_success">Success rate</option>
+          </select>
+        </div>
+        <button type="button" class="dirbtn" id="sortdir" data-i18n-aria="sortDirHint"></button>
+        <p class="hint" id="sorthint"></p>
+      </div>
+      <details class="box fold" id="showbox">
+        <summary><h3 data-i18n="alsoShow">Also show</h3><span class="hint" id="showcount"></span></summary>
+        <div class="checks" id="show">
+          <label><input type="checkbox" value="rscore"><span data-i18n="s_rscore">R-score (0–40)</span></label>
+          <label><input type="checkbox" value="grade"><span data-i18n="s_grade">Grade (0–100%)</span></label>
+          <label><input type="checkbox" value="distance"><span data-i18n="s_distance">Distance (km)</span></label>
+          <label><input type="checkbox" value="deadline"><span data-i18n="s_deadline">Admission deadline (DD/MM/YY)</span></label>
+          <label><input type="checkbox" value="docs"><span data-i18n="s_docs">Admission documents (Y/N + type)</span></label>
+          <label><input type="checkbox" value="interview"><span data-i18n="s_interview">Interview (Y/N)</span></label>
+          <label><input type="checkbox" value="tuition"><span data-i18n="s_tuition">Tuition cost ($ CAD)</span></label>
+          <label><input type="checkbox" value="clubs"><span data-i18n="s_clubs">Student clubs (number)</span></label>
+          <label><input type="checkbox" value="schol"><span data-i18n="s_schol">Scholarships ($ CAD)</span></label>
+          <label><input type="checkbox" value="living"><span data-i18n="s_living">Living cost (rent + groceries)</span></label>
+          <label><input type="checkbox" value="success"><span data-i18n="s_success">Success rate</span></label>
+        </div>
+      </details>
+      <div class="mapshade" id="mapshade" hidden></div>
+      <div class="box mapbox" id="mapbox">
+        <div class="maphead"><h3 data-i18n="map">Map</h3><button type="button" class="mapbtn" id="mapbtn" data-i18n="mapBig">⤢ Enlarge</button></div>
+        <svg class="map" id="map" role="img" data-i18n-aria="map" preserveAspectRatio="xMidYMid meet"></svg>
+        <div class="legend"><span><i class="dot g"></i><span data-i18n="lg_g">You should get in</span></span><span><i class="dot o"></i><span data-i18n="lg_o">It depends</span></span><span><i class="dot r"></i><span data-i18n="lg_r">Unlikely</span></span></div>
+      </div>
+    </aside>
+    <div class="main">
+      <h2 id="title"></h2>
+      <p class="warn" id="warn" role="status" hidden></p>
+      <div class="list" id="list"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PAGE 3: UNIVERSITY ================= -->
+<section class="page" id="p2">
+  <div class="bar">
+    <div class="brand"><img src="img/logo-icon.png" alt=""><span>UniVerse</span></div>
+    <div class="bar-r"><button class="btn ghost" data-go="1" data-i18n="back">Back to results</button>
+      <div class="lang" role="group" data-i18n-aria="language"><button type="button" data-lang="en">EN</button><button type="button" data-lang="fr">FR</button></div></div>
+  </div>
+  <div class="uhead"><div><p class="hint" id="usub"></p><h1 id="uname"></h1></div><span class="tag" id="ufit"></span></div>
+  <div class="tabs"><button class="on" data-tab="living" data-i18n="tLiving">Living</button><button data-tab="life" data-i18n="tLife">Student life</button><button data-tab="adm" data-i18n="tAdm">Admission</button><button data-tab="programs" data-i18n="tProg">Programs</button></div>
+  <div class="tiles on" id="living"></div>
+  <div class="tiles" id="life"></div>
+  <div class="tiles" id="adm"></div>
+  <div class="tiles" id="programs"></div>
+</section>
+
+<!-- Scripts: ORDER MATTERS (each file uses the ones above it) -->
+<script src="js/i18n.js"></script>
+<script src="js/data.js"></script>
+<script src="js/mapdata.js"></script>
+<!-- Program lists, one file per university (fill PROGRAM_DATA) -->
+<script src="js/programs/mcgill.js"></script>
+<script src="js/programs/udem.js"></script>
+<script src="js/programs/concordia.js"></script>
+<script src="js/programs/uqam.js"></script>
+<script src="js/programs/ets.js"></script>
+<script src="js/programs/ulaval.js"></script>
+<script src="js/programs/usherbrooke.js"></script>
+<script src="js/programs/uoft.js"></script>
+<script src="js/programs/york.js"></script>
+<script src="js/programs/uwaterloo.js"></script>
+<script src="js/programs/western.js"></script>
+<script src="js/programs/uottawa.js"></script>
+<script src="js/programs/queens.js"></script>
+<script src="js/programs/mcmaster.js"></script>
+<script src="js/programs/brock.js"></script>
+<!-- Admission deadlines, documents, interviews, scholarships, rent & groceries -->
+<script src="js/admissions.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/admission.js"></script>
+<script src="js/search.js"></script>
+<script src="js/results.js"></script>
+<script src="js/university.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
