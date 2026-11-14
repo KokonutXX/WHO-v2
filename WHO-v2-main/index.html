@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Campus Compare – Québec & Ontario</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/search.css">
+<link rel="stylesheet" href="css/results.css">
+<link rel="stylesheet" href="css/university.css">
+</head>
+<body>
+
+<!-- ================= PAGE 1: SEARCH ================= -->
+<section class="page active" id="p0">
+  <div class="brand"><i></i>UniVerse</div>
+  <div class="hero"><div>
+    <h1>Find the university that fits your grades.</h1>
+    <p>Quebec and Ontario, compared side by side.</p>
+    <form class="search" id="form" autocomplete="off">
+      <div class="field">
+        <label for="prog">Program</label>
+        <input id="prog" placeholder="Search a program, e.g. Kinesiology, Génie logiciel, Nursing" role="combobox">
+        <ul class="opts" id="opts"></ul>
+      </div>
+      <div class="two">
+        <div class="field"><label for="rs">R-score (optional)</label><input id="rs" type="number" step="0.1" min="0" max="45" placeholder="e.g. 31"></div>
+        <div class="field"><label for="gr">Grade % (optional)</label><input id="gr" type="number" step="0.1" min="0" max="100" placeholder="e.g. 88"></div>
+      </div>
+      <div class="two">
+        <div class="field"><label for="loc">Location</label><input id="loc" list="cities" placeholder="City (optional)"><datalist id="cities"></datalist></div>
+        <div class="field"><label for="rad">Within</label>
+          <select id="rad"><option value="0">Anywhere</option><option value="50">50 km</option><option value="100">100 km</option><option value="250">250 km</option><option value="500">500 km</option></select></div>
+      </div>
+      <p class="hint" id="err"></p>
+      <button class="btn" type="submit">Search</button>
+    </form>
+  </div></div>
+</section>
+
+<!-- ================= PAGE 2: RESULTS ================= -->
+<section class="page" id="p1">
+  <div class="bar"><div class="brand"><i></i>Campus Compare</div><button class="btn ghost" data-go="0">New search</button></div>
+  <div class="layout">
+    <aside class="side">
+      <h3>Your search</h3>
+      <div class="sum" id="sum"></div>
+      <div class="field"><label for="sort">Sort by</label>
+        <select id="sort"><option value="fit">Best chance of admission</option><option value="tuition">Lowest tuition</option><option value="rent">Lowest rent</option><option value="success">Highest success rate</option></select></div>
+      <div class="field"><label for="inc">Also show</label>
+        <select id="inc"><option value="tuition">Tuition per year</option><option value="rent">Monthly rent</option><option value="success">Success rate</option><option value="clubs">Student clubs</option><option value="programs">Matching programs</option></select></div>
+    </aside>
+    <div class="main">
+      <h2 id="title"></h2>
+      <svg class="map" id="map" viewBox="0 0 780 420" role="img" aria-label="Map of universities"></svg>
+      <div class="legend"><span><i class="dot g"></i>You should get in</span><span><i class="dot o"></i>It depends</span><span><i class="dot r"></i>Unlikely</span></div>
+      <div class="list" id="list"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PAGE 3: UNIVERSITY ================= -->
+<section class="page" id="p2">
+  <div class="bar"><div class="brand"><i></i>Campus Compare</div><button class="btn ghost" data-go="1">Back to results</button></div>
+  <div class="uhead"><div><p class="hint" id="usub"></p><h1 id="uname"></h1></div><span class="tag" id="ufit"></span></div>
+  <div class="tabs"><button class="on" data-tab="living">Living</button><button data-tab="life">Student life</button><button data-tab="programs">Programs</button></div>
+  <div class="tiles on" id="living"></div>
+  <div class="tiles" id="life"></div>
+  <div class="tiles" id="programs"></div>
+</section>
+
+<!-- Scripts: ORDER MATTERS (each file uses the ones above it) -->
+<script src="js/data.js"></script>
+<!-- Program lists, one file per university (fill PROGRAM_DATA) -->
+<script src="js/programs/mcgill.js"></script>
+<script src="js/programs/udem.js"></script>
+<script src="js/programs/concordia.js"></script>
+<script src="js/programs/uqam.js"></script>
+<script src="js/programs/ets.js"></script>
+<script src="js/programs/ulaval.js"></script>
+<script src="js/programs/usherbrooke.js"></script>
+<script src="js/programs/uoft.js"></script>
+<script src="js/programs/york.js"></script>
+<script src="js/programs/uwaterloo.js"></script>
+<script src="js/programs/western.js"></script>
+<script src="js/programs/uottawa.js"></script>
+<script src="js/programs/queens.js"></script>
+<script src="js/programs/mcmaster.js"></script>
+<script src="js/programs/brock.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/admission.js"></script>
+<script src="js/search.js"></script>
+<script src="js/results.js"></script>
+<script src="js/university.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
