@@ -63,7 +63,7 @@ function renderResults(){
   $('sorthint').textContent = S.loc ? '' : t('distSortHint');
 
   // Filter
-  const here = S.loc ? CITIES[S.loc] : null;
+  const here = S.loc ? placeLL(S.loc) : null;
   let all = UNIS.map(u => ({ u, f: fit(u), km: here ? km(here, u.ll) : null })).filter(x => x.f);
   if (here && S.rad) all = all.filter(x => x.km <= S.rad);
   const missing = all.filter(x => x.f.missing).length;
@@ -117,34 +117,61 @@ const HOME = ['Ontario', 'Québec', 'Quebec'];
 // Cities labelled on the small map (all are labelled when the map is enlarged)
 const MAIN_CITIES = ['Montréal', 'Québec City', 'Ottawa', 'Toronto', 'Kingston', 'London'];
 
+/* Pan / zoom: the visible part of the map is the SVG viewBox `view` (null = whole map).
+   Dragging only moves the viewBox; zooming redraws so markers/text keep the same size on screen. */
+let view = null;
+const MIN_W = () => MAP.w / 10;                                   // max zoom: 10x
+const curView = () => view || { x:0, y:0, w:MAP.w, h:MAP.h };
+function clampView(v){
+  v.w = Math.min(Math.max(v.w, MIN_W()), MAP.w); v.h = v.w * MAP.h / MAP.w;
+  v.x = Math.min(Math.max(v.x, 0), MAP.w - v.w); v.y = Math.min(Math.max(v.y, 0), MAP.h - v.h);
+  return v;
+}
+const setViewBox = () => { const v = curView(); $('map').setAttribute('viewBox', `${v.x} ${v.y} ${v.w} ${v.h}`); };
+function resetMapView(){ view = null; }
+// Zoom by `f` (>1 = in) around the point (cx, cy) in map units (default: centre of the view)
+function zoomMap(f, cx, cy){
+  const v = curView();
+  if (cx == null){ cx = v.x + v.w / 2; cy = v.y + v.h / 2; }
+  const w = Math.min(Math.max(v.w / f, MIN_W()), MAP.w), s = w / v.w;
+  view = clampView({ x:cx - (cx - v.x) * s, y:cy - (cy - v.y) * s, w });
+  if (view.w >= MAP.w) view = null;
+  drawMap();
+}
+
 function drawMap(){
   const svg = $('map'), rows = lastRows, here = lastHere;
   if (typeof MAP === 'undefined'){ svg.innerHTML = ''; return; }
-  const big = $('mapbox').classList.contains('big');
+  const big = $('mapbox').classList.contains('big'), v = curView(), zoomed = v.w < MAP.w * 0.6;
   $('mapbtn').textContent = t(big ? 'mapClose' : 'mapBig');
-  // Keep markers/text the same size on screen whatever the map's displayed size
-  const k = MAP.w / Math.max(svg.getBoundingClientRect().width || svg.clientWidth || 360, 1);
+  // Keep markers/text the same size on screen whatever the map's displayed size and zoom
+  const k = v.w / Math.max(svg.getBoundingClientRect().width || svg.clientWidth || 360, 1);
   const r = 9 * k, fs = 10 * k;
 
-  let s = `<rect width="${MAP.w}" height="${MAP.h}" fill="#cfe1f3"/>`;
-  s += MAP.land.map(l => `<path d="${l.d}" fill="${HOME.includes(l.n) ? '#fbfaf5' : '#ecebe3'}" stroke="#a9a596" stroke-width="${0.6 * k}" stroke-linejoin="round"/>`).join('');
-  s += MAP.rivers.map(d => `<path d="${d}" fill="none" stroke="#cfe1f3" stroke-width="${1.6 * k}" stroke-linecap="round"/>`).join('');
-  const region = (txt, lo, la) => { const [x, y] = proj([la, lo]); return `<text x="${x}" y="${y}" font-size="${13 * k}" font-weight="800" fill="#9aa1bd" letter-spacing="${2 * k}" text-anchor="middle">${txt}</text>`; };
+  // Map colors (soft matcha theme)
+  const C = { water:'#d5e5e0', home:'#fbfcf6', other:'#eceee3', border:'#a8af98', region:'#9aa58b', city:'#34422c', accent:'#4a6a2a', ink:'#1e2a1b' };
+  let s = `<rect width="${MAP.w}" height="${MAP.h}" fill="${C.water}"/>`;
+  s += MAP.land.map(l => `<path d="${l.d}" fill="${HOME.includes(l.n) ? C.home : C.other}" stroke="${C.border}" stroke-width="${0.6 * k}" stroke-linejoin="round"/>`).join('');
+  s += MAP.rivers.map(d => `<path d="${d}" fill="none" stroke="${C.water}" stroke-width="${1.6 * k}" stroke-linecap="round"/>`).join('');
+  const region = (txt, lo, la) => { const [x, y] = proj([la, lo]); return `<text x="${x}" y="${y}" font-size="${13 * k}" font-weight="800" fill="${C.region}" letter-spacing="${2 * k}" text-anchor="middle">${txt}</text>`; };
   s += region('ONTARIO', -80.6, 46.7) + region(LANG === 'fr' ? 'QUÉBEC' : 'QUEBEC', -72.6, 47.15) + region(LANG === 'fr' ? 'ÉTATS-UNIS' : 'UNITED STATES', -75.8, 42.3);
 
   // Search radius around the chosen city
   if (here){
-    const [hx, hy] = proj(here);
-    if (S.rad) s += `<circle cx="${hx}" cy="${hy}" r="${S.rad / 111.32 * MAP.s}" fill="rgba(58,82,255,.07)" stroke="#3a52ff" stroke-width="${k}" stroke-dasharray="${4 * k} ${3 * k}"/>`;
-    s += `<circle cx="${hx}" cy="${hy}" r="${4 * k}" fill="#fff" stroke="#12193a" stroke-width="${2 * k}"/>`;
+    let [hx, hy] = proj(here);
+    // Towns outside the drawn area (e.g. Thunder Bay) are pinned to the map edge
+    hx = Math.min(Math.max(hx, 6 * k), MAP.w - 6 * k); hy = Math.min(Math.max(hy, 6 * k), MAP.h - 6 * k);
+    if (S.rad) s += `<circle cx="${hx}" cy="${hy}" r="${S.rad / 111.32 * MAP.s}" fill="rgba(74,106,42,.1)" stroke="${C.accent}" stroke-width="${k}" stroke-dasharray="${4 * k} ${3 * k}"/>`;
+    s += `<circle cx="${hx}" cy="${hy}" r="${4 * k}" fill="#fff" stroke="${C.ink}" stroke-width="${2 * k}"/>`;
+    if (!CITIES[S.loc]) s += `<text x="${hx}" y="${hy - 7 * k}" font-size="${fs}" font-weight="700" text-anchor="middle" fill="${C.ink}" stroke="${C.home}" stroke-width="${3 * k}" paint-order="stroke">${esc(cityName(S.loc))}</text>`;
   }
 
   // City labels
   Object.entries(CITIES).forEach(([c, p]) => {
-    if (!big && !MAIN_CITIES.includes(c)) return;
+    if (!big && !zoomed && !MAIN_CITIES.includes(c)) return;
     const [x, y] = proj(p);
     const n = rows.filter(x2 => x2.u.city === c).length;
-    s += `<text x="${x}" y="${y + (n > 1 ? 2.6 : 1.9) * r + fs}" font-size="${fs}" text-anchor="middle" fill="#3b4570" stroke="#fbfaf5" stroke-width="${3 * k}" paint-order="stroke">${esc(cityName(c))}</text>`;
+    s += `<text x="${x}" y="${y + (n > 1 ? 2.6 : 1.9) * r + fs}" font-size="${fs}" text-anchor="middle" fill="${C.city}" stroke="${C.home}" stroke-width="${3 * k}" paint-order="stroke">${esc(cityName(c))}</text>`;
   });
 
   // Markers: universities in the same city are arranged in a small ring; #1 is drawn on top
@@ -161,10 +188,44 @@ function drawMap(){
       <circle cx="${mx}" cy="${my}" r="${r}" fill="${HEX[x.f.c]}" stroke="#fff" stroke-width="${2 * k}"/>
       <text x="${mx}" y="${my + fs * 0.36}" font-size="${fs}" font-weight="800" text-anchor="middle" fill="#fff">${x.rank}</text></g>`;
   }).join('');
-  s += `<text x="${MAP.w - 6 * k}" y="${MAP.h - 6 * k}" font-size="${8 * k}" text-anchor="end" fill="#6b7290">Natural Earth</text>`;
+  s += `<text x="${MAP.w - 6 * k}" y="${MAP.h - 6 * k}" font-size="${8 * k}" text-anchor="end" fill="${C.region}">Natural Earth</text>`;
 
-  svg.setAttribute('viewBox', `0 0 ${MAP.w} ${MAP.h}`);
+  setViewBox();
   svg.innerHTML = s;
+}
+
+// Drag to pan (mouse, pen or touch). A drag doesn't count as a click on a marker.
+function initMapPan(){
+  const svg = $('map');
+  let drag = null, moved = false;
+  svg.addEventListener('pointerdown', e => {
+    if (e.button !== 0) return;
+    drag = { x:e.clientX, y:e.clientY, v:{ ...curView() } }; moved = false;
+  });
+  window.addEventListener('pointermove', e => {
+    if (!drag) return;
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (!moved && Math.abs(dx) + Math.abs(dy) < 4) return;
+    if (!moved){ moved = true; svg.classList.add('grabbing'); }
+    const scale = drag.v.w / svg.getBoundingClientRect().width;      // screen px -> map units
+    view = clampView({ x:drag.v.x - dx * scale, y:drag.v.y - dy * scale, w:drag.v.w });
+    setViewBox();
+  });
+  window.addEventListener('pointerup', () => { if (drag){ drag = null; svg.classList.remove('grabbing'); } });
+  // swallow the click that ends a drag
+  svg.addEventListener('click', e => { if (moved){ e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
+  // Mouse wheel zooms only on the enlarged map (so scrolling the page isn't hijacked)
+  svg.addEventListener('wheel', e => {
+    if (!$('mapbox').classList.contains('big')) return;
+    e.preventDefault();
+    const b = svg.getBoundingClientRect(), v = curView();
+    // the SVG keeps its aspect ratio; convert the cursor position to map units
+    const sc = Math.min(b.width / v.w, b.height / v.h), ox = (b.width - v.w * sc) / 2, oy = (b.height - v.h * sc) / 2;
+    zoomMap(e.deltaY < 0 ? 1.25 : 0.8, v.x + (e.clientX - b.left - ox) / sc, v.y + (e.clientY - b.top - oy) / sc);
+  }, { passive:false });
+  $('zin').addEventListener('click', () => zoomMap(1.5));
+  $('zout').addEventListener('click', () => zoomMap(1 / 1.5));
+  $('zreset').addEventListener('click', () => { view = null; drawMap(); });
 }
 // Called after the results page becomes visible / on resize
 function fixMap(){ drawMap(); }
@@ -190,4 +251,5 @@ function initResults(){
   $('mapshade').addEventListener('click', () => toggleMap(false));
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('mapbox').classList.contains('big')) toggleMap(false); });
   window.addEventListener('resize', () => { if (curPage === 1) drawMap(); });
+  initMapPan();
 }

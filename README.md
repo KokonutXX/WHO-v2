@@ -31,6 +31,7 @@ js/
   admission.js      program matching, green / orange / red logic, missing-data rule
   search.js         page 1 behavior
   mapdata.js        map shapes (provinces, states, lakes, rivers); generated, don't edit by hand
+  places.js         EDIT HERE: extra towns users can type as their location (name, lat, lon, province)
   results.js        page 2: sort fields + direction, numbered cards, "also show" checklist, map
   university.js     page 3: Living / Student life / Admission / Programs tabs
   main.js           starts the app, re-renders on language change

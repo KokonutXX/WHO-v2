@@ -97,7 +97,15 @@
       <div class="mapshade" id="mapshade" hidden></div>
       <div class="box mapbox" id="mapbox">
         <div class="maphead"><h3 data-i18n="map">Map</h3><button type="button" class="mapbtn" id="mapbtn" data-i18n="mapBig">⤢ Enlarge</button></div>
-        <svg class="map" id="map" role="img" data-i18n-aria="map" preserveAspectRatio="xMidYMid meet"></svg>
+        <div class="mapwrap">
+          <svg class="map" id="map" role="img" data-i18n-aria="map" preserveAspectRatio="xMidYMid meet"></svg>
+          <div class="mapctl">
+            <button type="button" id="zin" data-i18n-aria="zoomIn">+</button>
+            <button type="button" id="zout" data-i18n-aria="zoomOut">−</button>
+            <button type="button" id="zreset" data-i18n-aria="zoomReset">⟲</button>
+          </div>
+        </div>
+        <p class="hint" data-i18n="mapHelp">Drag to move · + / − to zoom</p>
         <div class="legend"><span><i class="dot g"></i><span data-i18n="lg_g">You should get in</span></span><span><i class="dot o"></i><span data-i18n="lg_o">It depends</span></span><span><i class="dot r"></i><span data-i18n="lg_r">Unlikely</span></span></div>
       </div>
     </aside>
@@ -128,6 +136,7 @@
 <script src="js/i18n.js"></script>
 <script src="js/data.js"></script>
 <script src="js/mapdata.js"></script>
+<script src="js/places.js"></script>
 <!-- Program lists, one file per university (fill PROGRAM_DATA) -->
 <script src="js/programs/mcgill.js"></script>
 <script src="js/programs/udem.js"></script>

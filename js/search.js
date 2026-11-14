@@ -86,9 +86,23 @@ function readSelection(){
   return { type:'text', key:q, txt };
 }
 
-// City typed in either language -> CITIES key
-const findCity = s => { const q = norm(s); return Object.keys(CITIES).find(c => norm(c) === q || norm(CITY_FR[c] || c) === q); };
-const fillCities = () => { $('cities').innerHTML = Object.keys(CITIES).map(c => `<option value="${esc(cityName(c))}">`).join(''); };
+// Every place the user can type as a location: university cities (CITIES) + other towns (js/places.js)
+// name -> { ll:[lat, lon], prov }
+const placeKey = s => norm(s).replace(/\bste\b/g, 'sainte').replace(/\bst\b/g, 'saint');   // "St-Jérôme" = "Saint-Jérôme"
+const ALL_PLACES = (() => {
+  const m = new Map(), seen = new Set();
+  Object.entries(CITIES).forEach(([c, ll]) => { m.set(c, { ll, prov:(UNIS.find(u => u.city === c) || {}).prov }); seen.add(placeKey(c)); seen.add(placeKey(CITY_FR[c] || c)); });
+  (typeof PLACES !== 'undefined' ? PLACES : []).forEach(([n, la, lo, pr]) => { if (!seen.has(placeKey(n))){ m.set(n, { ll:[la, lo], prov:pr }); seen.add(placeKey(n)); } });
+  return m;
+})();
+const placeLL = name => (ALL_PLACES.get(name) || {}).ll || null;
+
+// Place typed in either language (accents, hyphens and St/Saint don't matter) -> ALL_PLACES key
+const findCity = s => { const q = placeKey(s); if (!q) return undefined; return [...ALL_PLACES.keys()].find(c => placeKey(c) === q || placeKey(CITY_FR[c] || c) === q); };
+const fillCities = () => {
+  $('cities').innerHTML = [...ALL_PLACES.keys()].sort((a, b) => cityName(a).localeCompare(cityName(b), LANG))
+    .map(c => `<option value="${esc(cityName(c))}">${ALL_PLACES.get(c).prov ? provName(ALL_PLACES.get(c).prov) : ''}</option>`).join('');
+};
 
 function initSearch(){
   $('prog').addEventListener('focus', fillOpts);
@@ -121,6 +135,7 @@ function initSearch(){
     S.r = $('rs').value === '' ? null : +$('rs').value;
     S.g = $('gr').value === '' ? null : +$('gr').value;
     S.loc = loc || ''; S.rad = +$('rad').value;
+    resetMapView();
     renderResults(); go(1);
   });
 }
