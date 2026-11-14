@@ -1,15 +1,9 @@
-# Campus Compare
+# UniVerse
 
-Compare universities in Québec and Ontario by program, R-score and grade.
-Three zoom-transition pages: **Search → Results → University**.
+For that moment when you want to compare universities in Quebec and Ontario. You start your search by selecting the program u want to go to, and putting in your R-score (and grade percentage if you're a Quebec student aiming for out of province ;) ).
 
-## Run it
-Open `index.html` in a browser. No build step, no dependencies.
+There's three pages: Search brings you to Results which then lets you choose a University
 
-## Put it on GitHub Pages
-1. Push this folder to a GitHub repository.
-2. Repo **Settings → Pages → Deploy from a branch → `main` / `(root)`**.
-3. Your site appears at `https://<username>.github.io/<repo>/`.
 
 ## Project structure
 ```
@@ -20,18 +14,18 @@ css/
   results.css       page 2
   university.css    page 3
 js/
-  data.js           EDIT HERE: programs, cities, universities
+  data.js           we can edit programs, cities and universities here
   utils.js          helpers, state, page navigation
-  admission.js      green / orange / red logic and tolerance
+  admission.js      green / orange / red logic for how easily accepted
   search.js         page 1 behavior
   results.js        page 2 behavior, sorting, map
   university.js     page 3 behavior
   main.js           starts the app
-```
-Script order in `index.html` matters: each file uses the ones above it.
+
 
 ## Common edits
-- **Real data:** `js/data.js` (all numbers are placeholders).
+````
+ **Real data:** `js/data.js` (all numbers are placeholders).
 - **Add a university:** copy one entry in `UNIS`.
 - **Add a program:** add it to `PROGRAMS`, then add `req` values to each university.
 - **Add a city:** add it to `CITIES` (and widen `BOUNDS` in `js/results.js` if it falls outside the map).
