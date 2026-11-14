@@ -4,7 +4,7 @@
    ===================================================== */
 
 // Programs shown in the search dropdown (id: display name)
-const PROGRAMS = { cs:'Computer Science', nur:'Nursing', bus:'Business', eng:'Engineering', psy:'Psychology' };
+const PROGRAMS = { cs:'Computer Science', nur:'Health & Medical sciences', bus:'Business', eng:'Engineering', psy:'Psychology' };
 
 // City coordinates [lat, lon] (used for the map and the distance filter)
 const CITIES = {
